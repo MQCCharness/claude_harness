@@ -3,255 +3,514 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>蜂群+军团 — Swarm & Legion | AI 对抗式协作方法论</title>
+<title>蜂群+军团 — Swarm &amp; Legion | AI 对抗式协作方法论</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=Noto+Sans+SC:wght@400;500;700;900&display=swap" rel="stylesheet">
 <style>
-  @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@400;700;900&display=swap');
-
   :root {
-    --bg: #0a0a14;
-    --surface: #12122a;
-    --border: #1e1e3a;
-    --gold: #f7c948;
-    --orange: #ff6b35;
-    --text: #e0e0e0;
-    --muted: #8888aa;
+    --bg-deepest: #07050E;
+    --bg: #0B0818;
+    --surface: #110D26;
+    --surface-raised: #181338;
+    --border: #1E1750;
+    --border-glow: #2D2068;
+    --purple: #7C3AED;
+    --purple-light: #A78BFA;
+    --purple-glow: #8B5CF6;
+    --green: #39FF14;
+    --green-dim: #22C55E;
+    --green-glow: #4ADE80;
+    --green-neon: #B0FF6E;
+    --orange: #F97316;
+    --orange-glow: #FB923C;
+    --text: #E8E4F0;
+    --text-dim: #9A93B5;
+    --text-muted: #6B6580;
+    --red: #EF4444;
+    --red-glow: #F87171;
   }
 
   * { margin: 0; padding: 0; box-sizing: border-box; }
 
+  html {
+    scroll-behavior: smooth;
+    background: var(--bg-deepest);
+  }
+
   body {
-    font-family: 'Noto Sans SC', system-ui, sans-serif;
-    background: var(--bg);
+    font-family: 'Inter', 'Noto Sans SC', system-ui, sans-serif;
+    background: var(--bg-deepest);
     color: var(--text);
-    line-height: 1.7;
-    overflow-x: hidden;
+    line-height: 1.6;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+
+  /* ── Ambient background ── */
+  body::before {
+    content: '';
+    position: fixed; inset: 0; z-index: 0;
+    background:
+      radial-gradient(ellipse 80% 60% at 50% 0%, rgba(124,58,237,0.08) 0%, transparent 60%),
+      radial-gradient(ellipse 60% 50% at 20% 80%, rgba(57,255,20,0.03) 0%, transparent 60%),
+      radial-gradient(ellipse 50% 40% at 80% 40%, rgba(249,115,22,0.03) 0%, transparent 60%);
+    pointer-events: none;
+  }
+
+  /* ── Grid overlay ── */
+  body::after {
+    content: '';
+    position: fixed; inset: 0; z-index: 0;
+    background-image:
+      linear-gradient(rgba(124,58,237,0.03) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(124,58,237,0.03) 1px, transparent 1px);
+    background-size: 64px 64px;
+    pointer-events: none;
+    mask-image: radial-gradient(ellipse 80% 60% at 50% 0%, black 30%, transparent 70%);
+    -webkit-mask-image: radial-gradient(ellipse 80% 60% at 50% 0%, black 30%, transparent 70%);
   }
 
   /* ── Navigation ── */
   nav {
     position: fixed; top: 0; width: 100%; z-index: 100;
-    background: rgba(10,10,20,0.85);
-    backdrop-filter: blur(12px);
+    background: rgba(7,5,14,0.8);
+    backdrop-filter: blur(20px) saturate(1.5);
+    -webkit-backdrop-filter: blur(20px) saturate(1.5);
     border-bottom: 1px solid var(--border);
     padding: 0 2rem;
     display: flex; align-items: center; justify-content: space-between;
-    height: 60px;
+    height: 56px;
   }
   nav .logo {
-    font-weight: 900; font-size: 1.25rem;
-    background: linear-gradient(135deg, var(--orange), var(--gold));
-    -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+    font-weight: 900; font-size: 1.05rem;
+    color: var(--text);
+    letter-spacing: -0.3px;
+    display: flex; align-items: center; gap: 0.5rem;
   }
-  nav .links { display: flex; gap: 1.5rem; }
+  nav .logo .icon {
+    width: 28px; height: 28px;
+    background: linear-gradient(135deg, var(--purple), #4C1D95);
+    border-radius: 6px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 0.8rem;
+    border: 1px solid var(--border-glow);
+  }
+  nav .links { display: flex; gap: 2rem; }
   nav .links a {
-    color: var(--muted); text-decoration: none;
-    font-size: 0.9rem; font-weight: 700; transition: color 0.2s;
+    color: var(--text-dim); text-decoration: none;
+    font-size: 0.82rem; font-weight: 500;
+    transition: color 0.2s; letter-spacing: -0.2px;
   }
-  nav .links a:hover { color: var(--gold); }
+  nav .links a:hover { color: var(--green); }
+
+  /* ── Section base ── */
+  .section-outer {
+    position: relative; z-index: 1;
+    padding: 6rem 2rem;
+    max-width: 1120px;
+    margin: 0 auto;
+  }
+
+  .section-label {
+    display: inline-flex; align-items: center; gap: 0.6rem;
+    font-size: 0.72rem; font-weight: 700;
+    letter-spacing: 2.5px;
+    text-transform: uppercase;
+    color: var(--green-dim);
+    margin-bottom: 1rem;
+  }
+  .section-label::before {
+    content: '';
+    display: inline-block;
+    width: 8px; height: 8px;
+    background: var(--green);
+    border-radius: 50%;
+    box-shadow: 0 0 8px var(--green), 0 0 16px rgba(57,255,20,0.4);
+  }
+
+  .section-title {
+    font-size: clamp(2.2rem, 4vw, 3.2rem);
+    font-weight: 900; letter-spacing: -1px;
+    line-height: 1.15; margin-bottom: 1rem;
+    color: #F0EDF6;
+  }
+  .section-desc {
+    color: var(--text-dim); font-size: 1.05rem;
+    max-width: 560px; line-height: 1.7; margin-bottom: 3.5rem;
+  }
 
   /* ── Hero ── */
   .hero {
+    position: relative; z-index: 1;
     min-height: 100vh; display: flex; flex-direction: column;
     align-items: center; justify-content: center; text-align: center;
     padding: 6rem 2rem 4rem;
-    position: relative;
-  }
-  .hero::before {
-    content: '';
-    position: absolute; inset: 0;
-    background: radial-gradient(ellipse at center, rgba(247,201,72,0.06) 0%, transparent 70%);
-    pointer-events: none;
   }
   .hero-badge {
-    display: inline-block;
-    background: linear-gradient(135deg, rgba(255,107,53,0.15), rgba(247,201,72,0.15));
-    border: 1px solid rgba(247,201,72,0.3);
+    display: inline-flex; align-items: center; gap: 0.5rem;
+    background: rgba(124,58,237,0.08);
+    border: 1px solid rgba(124,58,237,0.25);
     border-radius: 50px;
-    padding: 6px 20px; font-size: 0.85rem;
-    color: var(--gold); margin-bottom: 2rem;
+    padding: 6px 18px;
+    font-size: 0.8rem; font-weight: 500;
+    color: var(--purple-light);
+    margin-bottom: 2.5rem;
+    letter-spacing: -0.2px;
   }
+  .hero-badge .dot {
+    width: 6px; height: 6px;
+    background: var(--green);
+    border-radius: 50%;
+    box-shadow: 0 0 6px var(--green);
+    animation: pulse-dot 2s ease-in-out infinite;
+  }
+  @keyframes pulse-dot {
+    0%, 100% { opacity: 1; box-shadow: 0 0 4px var(--green); }
+    50% { opacity: 0.4; box-shadow: 0 0 12px var(--green), 0 0 20px rgba(57,255,20,0.5); }
+  }
+
   .hero h1 {
-    font-size: clamp(3rem, 8vw, 5.5rem);
-    font-weight: 900; letter-spacing: -2px;
-    line-height: 1.1; margin-bottom: 1.5rem;
+    font-size: clamp(3.2rem, 8vw, 6rem);
+    font-weight: 900; letter-spacing: -2.5px;
+    line-height: 1.05; margin-bottom: 1.5rem;
+    color: #F5F0FF;
   }
   .hero h1 .swarm {
-    background: linear-gradient(135deg, var(--orange), var(--gold));
+    background: linear-gradient(135deg, var(--purple-light) 0%, var(--purple) 40%, var(--green-neon) 100%);
     -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+    background-clip: text;
   }
-  .hero h1 .plus { color: var(--gold); }
+  .hero h1 .separator {
+    color: var(--green);
+    -webkit-text-fill-color: var(--green);
+    text-shadow: 0 0 40px rgba(57,255,20,0.4), 0 0 80px rgba(57,255,20,0.2);
+  }
   .hero h1 .legion {
-    background: linear-gradient(135deg, var(--gold), #ffe08a);
+    background: linear-gradient(135deg, var(--purple) 0%, #6D28D9 60%, var(--green-dim) 100%);
     -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+    background-clip: text;
   }
+
   .hero p.subtitle {
-    font-size: clamp(1.1rem, 2.5vw, 1.4rem);
-    color: var(--muted); max-width: 700px; margin-bottom: 3rem;
+    font-size: clamp(1.05rem, 2.2vw, 1.25rem);
+    color: var(--text-dim); max-width: 600px;
+    margin-bottom: 3rem; line-height: 1.7;
   }
-  .hero-cta {
-    display: flex; gap: 1rem; flex-wrap: wrap; justify-content: center;
+  .hero p.subtitle em {
+    font-style: normal;
+    color: var(--green);
+    text-shadow: 0 0 20px rgba(57,255,20,0.15);
   }
-  .btn-primary, .btn-secondary {
-    padding: 14px 32px; border-radius: 8px;
-    font-weight: 700; font-size: 1rem; text-decoration: none;
-    transition: all 0.3s;
-  }
+
+  .hero-cta { display: flex; gap: 1rem; flex-wrap: wrap; justify-content: center; }
+
   .btn-primary {
-    background: linear-gradient(135deg, var(--orange), #e85d2c);
-    color: #fff; box-shadow: 0 4px 24px rgba(255,107,53,0.25);
+    display: inline-flex; align-items: center; gap: 0.5rem;
+    padding: 13px 28px; border-radius: 8px;
+    font-weight: 600; font-size: 0.92rem;
+    text-decoration: none; letter-spacing: -0.3px;
+    background: linear-gradient(135deg, var(--purple), #6D28D9);
+    color: #fff;
+    border: 1px solid rgba(124,58,237,0.4);
+    box-shadow: 0 0 20px rgba(124,58,237,0.2), 0 4px 16px rgba(0,0,0,0.3);
+    transition: all 0.3s ease;
+    position: relative;
   }
-  .btn-primary:hover { transform: translateY(-2px); box-shadow: 0 8px 32px rgba(255,107,53,0.35); }
+  .btn-primary:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 0 32px rgba(124,58,237,0.35), 0 0 50px rgba(57,255,20,0.1), 0 8px 24px rgba(0,0,0,0.4);
+    border-color: rgba(124,58,237,0.6);
+  }
   .btn-secondary {
-    border: 1px solid var(--border); color: var(--text);
+    display: inline-flex; align-items: center; gap: 0.5rem;
+    padding: 13px 28px; border-radius: 8px;
+    font-weight: 600; font-size: 0.92rem;
+    text-decoration: none; letter-spacing: -0.3px;
+    border: 1px solid var(--border);
+    color: var(--text-dim);
+    transition: all 0.3s ease;
   }
-  .btn-secondary:hover { border-color: var(--gold); color: var(--gold); }
-
-  /* ── Hex grid background ── */
-  .hex-bg {
-    position: absolute; inset: 0; overflow: hidden; pointer-events: none; opacity: 0.03;
-  }
-  .hex-bg svg { width: 100%; height: 100%; }
-
-  /* ── Sections ── */
-  section { padding: 5rem 2rem; max-width: 1200px; margin: 0 auto; }
-  .section-label {
-    text-transform: uppercase; letter-spacing: 3px;
-    font-size: 0.75rem; font-weight: 700;
-    color: var(--gold); margin-bottom: 0.75rem;
-  }
-  .section-title {
-    font-size: clamp(2rem, 4vw, 3rem);
-    font-weight: 900; margin-bottom: 1rem;
-  }
-  .section-desc {
-    color: var(--muted); max-width: 600px;
-    font-size: 1.1rem; margin-bottom: 3rem;
+  .btn-secondary:hover {
+    border-color: var(--green-dim);
+    color: var(--green);
+    box-shadow: 0 0 16px rgba(57,255,20,0.06);
   }
 
-  /* ── Level cards (L1/L2/L3) ── */
-  .level-grid {
-    display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
-    gap: 1.5rem;
+  /* Hex pattern behind hero */
+  .hex-pattern {
+    position: absolute; inset: 0; overflow: hidden; pointer-events: none; z-index: 0;
   }
-  .level-card {
-    background: var(--surface); border: 1px solid var(--border);
-    border-radius: 16px; padding: 2rem;
-    transition: border-color 0.3s, transform 0.3s;
+  .hex-pattern svg {
+    width: 100%; height: 100%;
+    opacity: 0.04;
+    color: var(--purple-light);
+  }
+
+  /* ── Level Cards ── */
+  .card-grid-3 {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 1.25rem;
+  }
+  .card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 14px; padding: 2rem 1.75rem;
+    transition: all 0.35s ease;
     position: relative; overflow: hidden;
   }
-  .level-card:hover { border-color: var(--gold); transform: translateY(-4px); }
-  .level-card .tag {
-    display: inline-block; padding: 4px 12px; border-radius: 4px;
-    font-weight: 900; font-size: 0.75rem; margin-bottom: 1rem;
+  .card::after {
+    content: '';
+    position: absolute; inset: 0;
+    background: radial-gradient(circle at 100% 0%, rgba(124,58,237,0.06) 0%, transparent 60%);
+    pointer-events: none;
   }
-  .tag-l1 { background: rgba(136,136,170,0.2); color: var(--muted); }
-  .tag-l2 { background: rgba(255,107,53,0.2); color: var(--orange); }
-  .tag-l3 { background: rgba(247,201,72,0.2); color: var(--gold); }
-  .level-card h3 { font-size: 1.5rem; margin-bottom: 0.75rem; }
-  .level-card p { color: var(--muted); font-size: 0.95rem; }
+  .card:hover {
+    border-color: var(--border-glow);
+    transform: translateY(-3px);
+    box-shadow: 0 8px 32px rgba(0,0,0,0.3), 0 0 0 1px var(--border-glow);
+  }
+  .card .tag {
+    display: inline-block; padding: 3px 10px; border-radius: 4px;
+    font-weight: 700; font-size: 0.7rem; letter-spacing: 0.8px;
+    margin-bottom: 1.25rem; position: relative; z-index: 1;
+  }
+  .tag-l1 {
+    background: rgba(154,147,181,0.1); color: var(--text-dim);
+    border: 1px solid rgba(154,147,181,0.15);
+  }
+  .tag-l2 {
+    background: rgba(57,255,20,0.06); color: var(--green);
+    border: 1px solid rgba(57,255,20,0.15);
+  }
+  .tag-l3 {
+    background: rgba(124,58,237,0.1); color: var(--purple-light);
+    border: 1px solid rgba(124,58,237,0.2);
+  }
+  .card h3 {
+    font-size: 1.35rem; font-weight: 800;
+    margin-bottom: 0.6rem; position: relative; z-index: 1;
+    letter-spacing: -0.5px;
+  }
+  .card p {
+    color: var(--text-dim); font-size: 0.9rem;
+    line-height: 1.65; position: relative; z-index: 1;
+  }
 
-  /* ── Role cards ── */
+  /* ── Role grid ── */
   .role-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
-    gap: 1rem;
+    grid-template-columns: repeat(auto-fill, minmax(155px, 1fr));
+    gap: 0.75rem;
   }
   .role-card {
-    background: var(--surface); border: 1px solid var(--border);
-    border-radius: 12px; padding: 1.5rem 1.25rem;
-    text-align: center; transition: all 0.3s;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 10px; padding: 1.25rem 1rem;
+    text-align: center;
+    transition: all 0.3s ease;
+    position: relative; overflow: hidden;
   }
-  .role-card:hover { border-color: var(--orange); }
+  .role-card::after {
+    content: '';
+    position: absolute; top: 0; left: 0; right: 0;
+    height: 1px;
+    background: linear-gradient(90deg, transparent, rgba(57,255,20,0.2), transparent);
+    opacity: 0; transition: opacity 0.3s;
+  }
+  .role-card:hover {
+    border-color: var(--green-dim);
+    transform: translateY(-2px);
+  }
+  .role-card:hover::after { opacity: 1; }
   .role-code {
-    font-weight: 900; font-size: 1.5rem;
-    background: linear-gradient(135deg, var(--orange), var(--gold));
+    font-weight: 900; font-size: 1.4rem;
+    background: linear-gradient(135deg, var(--purple-light), var(--green-dim));
     -webkit-background-clip: text; -webkit-text-fill-color: transparent;
-    margin-bottom: 0.5rem;
+    background-clip: text;
+    margin-bottom: 0.4rem;
   }
-  .role-name { font-weight: 700; font-size: 0.95rem; margin-bottom: 0.4rem; }
-  .role-desc { color: var(--muted); font-size: 0.8rem; line-height: 1.5; }
+  .role-name { font-weight: 700; font-size: 0.88rem; margin-bottom: 0.3rem; }
+  .role-desc { color: var(--text-dim); font-size: 0.75rem; line-height: 1.5; }
 
   /* ── Gate diagram ── */
-  .gate-diagram {
-    background: var(--surface); border: 1px solid var(--border);
-    border-radius: 16px; padding: 2rem;
+  .gate-flow {
     display: flex; align-items: center; justify-content: center;
-    flex-wrap: wrap; gap: 0.75rem; overflow-x: auto;
+    flex-wrap: wrap; gap: 0.5rem 0.75rem;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 14px; padding: 2rem 1.5rem;
   }
-  .gate-block {
-    background: rgba(255,107,53,0.1); border: 1px solid rgba(255,107,53,0.3);
-    border-radius: 10px; padding: 0.75rem 1rem;
-    text-align: center; min-width: 100px;
+  .gate-node {
+    background: rgba(124,58,237,0.06);
+    border: 1px solid rgba(124,58,237,0.2);
+    border-radius: 8px;
+    padding: 0.65rem 0.9rem; text-align: center;
+    min-width: 90px;
+    transition: all 0.3s ease;
   }
-  .gate-block strong { display: block; font-size: 0.85rem; margin-bottom: 0.25rem; }
-  .gate-block span { font-size: 0.7rem; color: var(--muted); }
-  .gate-arrow { color: var(--gold); font-weight: 900; font-size: 1.2rem; }
-  .gate-parallel { border-color: rgba(247,201,72,0.4); background: rgba(247,201,72,0.05); }
+  .gate-node strong { display: block; font-size: 0.8rem; margin-bottom: 0.15rem; }
+  .gate-node span { font-size: 0.66rem; color: var(--text-muted); }
+  .gate-node.parallel {
+    border-color: rgba(57,255,20,0.2);
+    background: rgba(57,255,20,0.04);
+  }
+  .gate-node.decision {
+    border-color: rgba(57,255,20,0.35);
+    background: rgba(57,255,20,0.06);
+    box-shadow: 0 0 12px rgba(57,255,20,0.06);
+  }
+  .gate-arrow {
+    color: var(--green-dim); font-weight: 800; font-size: 1rem;
+    opacity: 0.6;
+  }
 
-  /* ── Timeline ── */
-  .timeline {
+  /* ── Timeline / Phases ── */
+  .phase-flow {
     display: flex; flex-wrap: wrap; gap: 0.5rem;
-    justify-content: center;
+    justify-content: center; align-items: center;
   }
-  .timeline-step {
+  .phase-node {
     background: var(--surface); border: 1px solid var(--border);
-    border-radius: 8px; padding: 0.6rem 1rem;
-    font-weight: 700; font-size: 0.85rem;
+    border-radius: 8px; padding: 0.55rem 0.9rem;
+    font-weight: 600; font-size: 0.78rem;
+    letter-spacing: -0.2px;
   }
-  .timeline-step.num { color: var(--gold); }
-  .timeline-arrow { color: var(--orange); align-self: center; font-weight: 900; }
+  .phase-node.active {
+    border-color: var(--green-dim);
+    background: rgba(57,255,20,0.04);
+  }
+  .phase-node.warning {
+    border-color: rgba(249,115,22,0.4);
+    background: rgba(249,115,22,0.06);
+  }
+  .phase-num { color: var(--green); font-weight: 800; }
+  .phase-arrow { color: var(--text-muted); font-weight: 700; }
 
-  /* ── Charter table ── */
-  .charter-table {
-    width: 100%; border-collapse: collapse;
-    background: var(--surface); border-radius: 12px; overflow: hidden;
+  /* ── Table ── */
+  .table-wrap {
+    background: var(--surface); border: 1px solid var(--border);
+    border-radius: 12px; overflow: hidden;
   }
-  .charter-table th {
-    background: rgba(247,201,72,0.1); padding: 1rem;
-    text-align: left; font-weight: 700; font-size: 0.85rem;
+  table { width: 100%; border-collapse: collapse; }
+  th {
+    background: rgba(124,58,237,0.08);
+    padding: 0.9rem 1rem; text-align: left;
+    font-weight: 600; font-size: 0.78rem;
+    color: var(--purple-light);
+    letter-spacing: 0.5px;
   }
-  .charter-table td { padding: 0.85rem 1rem; border-top: 1px solid var(--border); }
-  .charter-table .lock { color: var(--orange); font-weight: 700; }
-  .charter-table .lock-no { color: #e53e3e; }
+  td {
+    padding: 0.8rem 1rem; border-top: 1px solid var(--border);
+    font-size: 0.88rem;
+  }
+  .lock { color: var(--orange); font-weight: 600; }
+  .lock-no { color: var(--red); font-weight: 600; }
 
-  /* ── Commands grid ── */
+  /* ── Command grid ── */
   .cmd-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
-    gap: 0.75rem;
+    grid-template-columns: repeat(auto-fill, minmax(270px, 1fr));
+    gap: 0.6rem;
   }
   .cmd-item {
     background: var(--surface); border: 1px solid var(--border);
-    border-radius: 8px; padding: 0.75rem 1rem;
-    display: flex; align-items: center; gap: 0.75rem;
+    border-radius: 7px; padding: 0.65rem 0.9rem;
+    display: flex; align-items: center; gap: 0.65rem;
+    transition: all 0.25s ease;
+  }
+  .cmd-item:hover {
+    border-color: var(--border-glow);
   }
   .cmd-item code {
-    background: rgba(247,201,72,0.1); color: var(--gold);
-    padding: 3px 8px; border-radius: 4px; font-size: 0.8rem;
+    background: rgba(57,255,20,0.06);
+    color: var(--green);
+    padding: 3px 8px; border-radius: 4px;
+    font-size: 0.75rem; font-weight: 600;
     white-space: nowrap;
+    border: 1px solid rgba(57,255,20,0.12);
   }
-  .cmd-item span { color: var(--muted); font-size: 0.8rem; }
+  .cmd-item span { color: var(--text-dim); font-size: 0.78rem; }
+
+  /* ── Verdict cards ── */
+  .verdict-grid {
+    display: flex; gap: 1rem; margin-top: 1.5rem;
+    flex-wrap: wrap; justify-content: center;
+  }
+  .verdict-card {
+    background: var(--surface); border: 1px solid var(--border);
+    border-radius: 10px; padding: 1.25rem 1.5rem;
+    text-align: center; min-width: 140px;
+    transition: all 0.3s ease;
+  }
+  .verdict-card:hover { border-color: var(--border-glow); }
+  .verdict-card .v-label { font-size: 1.6rem; font-weight: 900; letter-spacing: -0.5px; }
+  .verdict-card .v-desc { color: var(--text-muted); font-size: 0.75rem; margin-top: 0.3rem; }
+  .v-pass { color: var(--green); text-shadow: 0 0 20px rgba(57,255,20,0.2); }
+  .v-cond { color: var(--orange); text-shadow: 0 0 20px rgba(249,115,22,0.15); }
+  .v-fail { color: var(--red); text-shadow: 0 0 20px rgba(239,68,68,0.2); }
 
   /* ── Footer ── */
   footer {
+    position: relative; z-index: 1;
     text-align: center; padding: 3rem 2rem;
-    border-top: 1px solid var(--border); color: var(--muted); font-size: 0.85rem;
+    border-top: 1px solid var(--border);
+    color: var(--text-muted); font-size: 0.8rem;
   }
-  footer a { color: var(--gold); text-decoration: none; }
+  footer a { color: var(--green-dim); text-decoration: none; }
+  footer a:hover { color: var(--green); }
+
+  /* ── Highlighted section backgrounds ── */
+  .bg-purple { background: rgba(124,58,237,0.015); }
+  .bg-green { background: rgba(57,255,20,0.01); }
+  .bg-orange { background: rgba(249,115,22,0.012); }
+
+  /* ── NERV-style warning block ── */
+  .warning-block {
+    display: flex; align-items: flex-start; gap: 1rem;
+    background: rgba(239,68,68,0.04); border: 1px solid rgba(239,68,68,0.2);
+    border-radius: 10px; padding: 1.25rem 1.5rem;
+    margin-top: 2rem; max-width: 640px;
+  }
+  .warning-block .w-icon {
+    color: var(--red); font-weight: 900; font-size: 1.2rem;
+    text-shadow: 0 0 10px rgba(239,68,68,0.3);
+    flex-shrink: 0;
+  }
+  .warning-block .w-text { font-size: 0.82rem; color: var(--text-dim); line-height: 1.6; }
+  .warning-block .w-text strong { color: var(--red-glow); }
 
   /* ── Responsive ── */
   @media (max-width: 768px) {
     nav .links { display: none; }
-    section { padding: 3rem 1rem; }
-    .gate-diagram { flex-direction: column; }
+    .section-outer { padding: 3rem 1rem; }
+    .gate-flow { flex-direction: column; align-items: stretch; }
+    .gate-arrow { text-align: center; }
+    .card-grid-3 { grid-template-columns: 1fr; }
   }
+
+  /* Animations */
+  @keyframes fade-up {
+    from { opacity: 0; transform: translateY(20px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+  .animate-in {
+    animation: fade-up 0.6s ease both;
+  }
+  .delay-1 { animation-delay: 0.1s; }
+  .delay-2 { animation-delay: 0.2s; }
+  .delay-3 { animation-delay: 0.3s; }
 </style>
 </head>
 <body>
 
 <!-- Navigation -->
 <nav>
-  <div class="logo">🐝 SWARM + ⚔️ LEGION</div>
+  <div class="logo">
+    <div class="icon">⚡</div>
+    SWARM + LEGION
+  </div>
   <div class="links">
     <a href="#levels">模式层级</a>
     <a href="#swarm">蜂群 L2</a>
@@ -262,16 +521,24 @@
 
 <!-- Hero -->
 <section class="hero">
-  <div class="hex-bg">
-    <svg viewBox="0 0 800 600"><defs><pattern id="hex" width="80" height="69.28" patternUnits="userSpaceOnUse"><polygon points="40,0 80,23.09 80,46.19 40,69.28 0,46.19 0,23.09" fill="none" stroke="currentColor" stroke-width="1"/></pattern></defs><rect width="100%" height="100%" fill="url(#hex)"/></svg>
+  <div class="hex-pattern">
+    <svg viewBox="0 0 800 600">
+      <defs>
+        <pattern id="hexgrid" width="60" height="51.96" patternUnits="userSpaceOnUse">
+          <polygon points="30,0 60,17.32 60,34.64 30,51.96 0,34.64 0,17.32" fill="none" stroke="currentColor" stroke-width="0.8"/>
+        </pattern>
+      </defs>
+      <rect width="100%" height="100%" fill="url(#hexgrid)"/>
+    </svg>
   </div>
-  <div class="hero-badge">AI 辅助软件开发 · 多角色对抗式协作方法论</div>
+
+  <div class="hero-badge"><span class="dot"></span> AI 辅助软件开发 · 多角色对抗式协作方法论</div>
   <h1>
-    <span class="swarm">蜂群</span><span class="plus">+</span><span class="legion">军团</span>
+    <span class="swarm">蜂群</span><span class="separator">+</span><span class="legion">军团</span>
   </h1>
   <p class="subtitle">
-    从单人直执行（L1）到五段满编蜂群（L2）再到多部门军团（L3）<br>
-    三级可缩放治理体系 · 对抗产生质量
+    从单人直执行到五段满编蜂群到多部门军团<br>
+    <em>三级可缩放治理体系 · 对抗产生质量</em>
   </p>
   <div class="hero-cta">
     <a href="#levels" class="btn-primary">探索体系</a>
@@ -280,23 +547,23 @@
 </section>
 
 <!-- Levels -->
-<section id="levels">
+<section id="levels" class="section-outer">
   <div class="section-label">三级可缩放治理</div>
   <h2 class="section-title">从轻量到重型，按需激活</h2>
-  <p class="section-desc">根据任务风险和规模，逐级升级治理强度。L1 用于日常小任务，L2 用于实质性代码改动，L3 用于大型多模块项目。</p>
+  <p class="section-desc">根据任务风险和规模逐级升级治理强度。L1 日常小任务，L2 实质性代码改动，L3 大型多模块项目。</p>
 
-  <div class="level-grid">
-    <div class="level-card">
+  <div class="card-grid-3">
+    <div class="card">
       <span class="tag tag-l1">L1</span>
       <h3>单人直执行</h3>
       <p>统帅直接执行任务，不启动多角色。适用于简单修改、信息查询、低风险操作。</p>
     </div>
-    <div class="level-card">
+    <div class="card">
       <span class="tag tag-l2">L2</span>
       <h3>蜂群模式 · 4+1 对抗</h3>
       <p>R1 需求撕裂 · R2 技术调研 · R3 核心开发 · R4a/R4b 独立测试 · +1 统帅。五段对抗式开发，写码回合强制门禁。</p>
     </div>
-    <div class="level-card">
+    <div class="card">
       <span class="tag tag-l3">L3</span>
       <h3>军团模式 · EX/MG/OP</h3>
       <p>高管层战略决策 + 中层管理协调 + 末端执行带蜂群小队。六阶段强制门禁，末端叶 OP 强制满编蜂群。</p>
@@ -304,115 +571,111 @@
   </div>
 </section>
 
-<!-- Swarm Section -->
-<section id="swarm" style="background:rgba(255,107,53,0.02)">
+<!-- Swarm -->
+<section id="swarm" class="section-outer bg-purple">
   <div class="section-label">L2 · 蜂群模式</div>
   <h2 class="section-title">4+1 对抗式开发</h2>
   <p class="section-desc">五个固定角色 + 统帅，通过强制多角色隔离审查，将认知盲区系统性暴露在代码落地之前。</p>
 
-  <div class="role-grid" style="margin-bottom:3rem">
+  <div class="role-grid" style="margin-bottom:2.5rem">
     <div class="role-card">
-      <div class="role-code">R1</div>
-      <div class="role-name">需求撕裂者</div>
+      <div class="role-code">R1</div><div class="role-name">需求撕裂者</div>
       <div class="role-desc">边缘场景 · 矛盾需求 · 极限输入 · 安全性质询</div>
     </div>
     <div class="role-card">
-      <div class="role-code">R2</div>
-      <div class="role-name">技术调研员</div>
+      <div class="role-code">R2</div><div class="role-name">技术调研员</div>
       <div class="role-desc">选型调研 · 官方文档核对 · CVE 检索 · 最佳实践</div>
     </div>
     <div class="role-card">
-      <div class="role-code">R3</div>
-      <div class="role-name">核心开发者</div>
+      <div class="role-code">R3</div><div class="role-name">核心开发者</div>
       <div class="role-desc">架构设计 · 代码实现 · 约束落地 · 回滚点说明</div>
     </div>
     <div class="role-card">
-      <div class="role-code">R4a</div>
-      <div class="role-name">测试员 · 清单</div>
+      <div class="role-code">R4a</div><div class="role-name">测试员 · 清单</div>
       <div class="role-desc">黑盒验收表 · DoD · TC-B/TC-E 编号 · 契约级</div>
     </div>
     <div class="role-card">
-      <div class="role-code">R4b</div>
-      <div class="role-name">测试员 · 核验</div>
+      <div class="role-code">R4b</div><div class="role-name">测试员 · 核验</div>
       <div class="role-desc">对照清单事实核对 · 漏项指出 · 关门裁决</div>
     </div>
     <div class="role-card">
-      <div class="role-code">+1</div>
-      <div class="role-name">统帅</div>
+      <div class="role-code">+1</div><div class="role-name">统帅</div>
       <div class="role-desc">目标锚定 · 分发汇流 · 拍板实测 · PASS/FAIL 裁决</div>
     </div>
   </div>
 
-  <h3 style="text-align:center;margin-bottom:1.5rem;font-size:1.2rem;">编队时序闸门</h3>
-  <div class="gate-diagram">
-    <div class="gate-block"><strong>Gate 0</strong><span>执行配置关门</span></div>
+  <h3 style="text-align:center;margin-bottom:1.25rem;font-size:1.1rem;font-weight:700;letter-spacing:-0.3px;">编队时序闸门</h3>
+  <div class="gate-flow">
+    <div class="gate-node"><strong>Gate 0</strong><span>执行配置关门</span></div>
     <span class="gate-arrow">→</span>
-    <div class="gate-block gate-parallel"><strong>R1 ∥ R2</strong><span>可并行派发</span></div>
+    <div class="gate-node parallel"><strong>R1 ∥ R2</strong><span>可并行派发</span></div>
     <span class="gate-arrow">→</span>
-    <div class="gate-block"><strong>Gate 1</strong><span>R1+R2 关门</span></div>
+    <div class="gate-node"><strong>Gate 1</strong><span>R1+R2 关门</span></div>
     <span class="gate-arrow">→</span>
-    <div class="gate-block gate-parallel"><strong>R3 ∥ R4a</strong><span>R4a 黑盒不依赖 R3</span></div>
+    <div class="gate-node parallel"><strong>R3 ∥ R4a</strong><span>R4a 黑盒不依赖 R3</span></div>
     <span class="gate-arrow">→</span>
-    <div class="gate-block"><strong>R4b</strong><span>关门核验</span></div>
+    <div class="gate-node"><strong>R4b</strong><span>关门核验</span></div>
     <span class="gate-arrow">→</span>
-    <div class="gate-block"><strong style="color:var(--gold)">PASS/FAIL</strong><span>统帅亲测裁决</span></div>
+    <div class="gate-node decision"><strong>PASS/FAIL</strong><span>统帅亲测裁决</span></div>
   </div>
 </section>
 
-<!-- Legion Section -->
-<section id="legion">
+<!-- Legion -->
+<section id="legion" class="section-outer bg-green">
   <div class="section-label">L3 · 军团模式</div>
   <h2 class="section-title">EX · MG · OP 三层组织 + 六阶段门禁</h2>
   <p class="section-desc">军团模式是最高治理层级，为大型多模块项目引入可定制的组织架构和严格的阶段化流程。</p>
 
-  <div class="level-grid" style="margin-bottom:2rem">
-    <div class="level-card">
+  <div class="card-grid-3" style="margin-bottom:2.5rem">
+    <div class="card">
       <span class="tag tag-l3">L3-EX</span>
       <h3>高管层</h3>
       <p>战略决策 · 任务拆解 · 跨域协调 · 风险识别。默认不带蜂群。</p>
     </div>
-    <div class="level-card">
+    <div class="card">
       <span class="tag tag-l3">L3-MG</span>
       <h3>中层管理</h3>
       <p>承上启下 · 多角色协调 · 汇流整合 · 质量标准。默认不带蜂群。</p>
     </div>
-    <div class="level-card">
+    <div class="card">
       <span class="tag tag-l3">L3-OP</span>
       <h3>末端执行</h3>
-      <p>具体执行 + <strong style="color:var(--gold)">带蜂群小队</strong>。叶 OP 强制 R1–R4b 五段满编 + 时序闸门。</p>
+      <p>具体执行 + <strong style="color:var(--green);text-shadow:0 0 10px rgba(57,255,20,0.15);">带蜂群小队</strong>。叶 OP 强制 R1–R4b 五段满编 + 时序闸门。</p>
     </div>
   </div>
 
-  <h3 style="text-align:center;margin-bottom:1.5rem;font-size:1.2rem;">六阶段强制门禁</h3>
-  <div class="gate-diagram" style="margin-bottom:2rem">
-    <div class="gate-block"><strong>①</strong><span>领域识别与目标收敛</span></div>
-    <span class="gate-arrow">→</span>
-    <div class="gate-block"><strong>②</strong><span>联网调研 (WebSearch)</span></div>
-    <span class="gate-arrow">→</span>
-    <div class="gate-block"><strong>③</strong><span>可编辑架构方案图</span></div>
-    <span class="gate-arrow">→</span>
-    <div class="gate-block" style="border-color:var(--gold)"><strong>⛔ GATE</strong><span>用户显式确认架构</span></div>
-    <span class="gate-arrow">→</span>
-    <div class="gate-block"><strong>④</strong><span>冻结三件套</span></div>
-    <span class="gate-arrow">→</span>
-    <div class="gate-block"><strong>⑤</strong><span>分阶段执行 EP-0→1→…</span></div>
-    <span class="gate-arrow">→</span>
-    <div class="gate-block"><strong>⑥</strong><span>汇流与回声校验</span></div>
+  <h3 style="text-align:center;margin-bottom:1.25rem;font-size:1.1rem;font-weight:700;letter-spacing:-0.3px;">六阶段强制门禁</h3>
+  <div class="gate-flow" style="margin-bottom:2.5rem">
+    <div class="phase-node"><span class="phase-num">①</span> 领域识别与目标收敛</div>
+    <span class="phase-arrow">→</span>
+    <div class="phase-node"><span class="phase-num">②</span> 联网调研</div>
+    <span class="phase-arrow">→</span>
+    <div class="phase-node"><span class="phase-num">③</span> 可编辑架构方案图</div>
+    <span class="phase-arrow">→</span>
+    <div class="phase-node warning"><span class="phase-num">⛔ GATE</span> 用户显式确认</div>
+    <span class="phase-arrow">→</span>
+    <div class="phase-node"><span class="phase-num">④</span> 冻结三件套</div>
+    <span class="phase-arrow">→</span>
+    <div class="phase-node"><span class="phase-num">⑤</span> 分阶段执行</div>
+    <span class="phase-arrow">→</span>
+    <div class="phase-node active"><span class="phase-num">⑥</span> 汇流与回声校验</div>
   </div>
 
-  <h3 style="text-align:center;margin-bottom:1rem;font-size:1.2rem;">军令状五要素</h3>
-  <table class="charter-table">
-    <tr><th>#</th><th>要素</th><th>说明</th><th>修改权</th></tr>
-    <tr><td>①</td><td><strong>原始需求</strong></td><td>用户原话，不得改写</td><td class="lock-no">🚫 禁止</td></tr>
-    <tr><td>②</td><td><strong>冻结目标句</strong></td><td>一句话描述要做成什么</td><td class="lock">仅用户</td></tr>
-    <tr><td>③</td><td><strong>硬约束</strong></td><td>不可逾越的技术/业务/合规底线</td><td class="lock">仅用户</td></tr>
-    <tr><td>④</td><td><strong>非目标</strong></td><td>明确不做什么，防止范围蔓延</td><td class="lock">仅用户追加</td></tr>
-    <tr><td>⑤</td><td><strong>成功标准</strong></td><td>可验证的验收条件</td><td class="lock">仅用户</td></tr>
-  </table>
+  <h3 style="text-align:center;margin-bottom:1rem;font-size:1.1rem;font-weight:700;letter-spacing:-0.3px;">军令状五要素</h3>
+  <div class="table-wrap">
+    <table>
+      <tr><th>#</th><th>要素</th><th>说明</th><th>修改权</th></tr>
+      <tr><td>①</td><td><strong>原始需求</strong></td><td>用户原话，不得改写</td><td class="lock-no">禁止</td></tr>
+      <tr><td>②</td><td><strong>冻结目标句</strong></td><td>一句话描述要做成什么</td><td class="lock">仅用户</td></tr>
+      <tr><td>③</td><td><strong>硬约束</strong></td><td>不可逾越的技术/业务/合规底线</td><td class="lock">仅用户</td></tr>
+      <tr><td>④</td><td><strong>非目标</strong></td><td>明确不做什么，防止范围蔓延</td><td class="lock">仅用户追加</td></tr>
+      <tr><td>⑤</td><td><strong>成功标准</strong></td><td>可验证的验收条件</td><td class="lock">仅用户</td></tr>
+    </table>
+  </div>
 </section>
 
 <!-- Commands -->
-<section id="commands" style="background:rgba(247,201,72,0.02)">
+<section id="commands" class="section-outer bg-orange">
   <div class="section-label">命令速查</div>
   <h2 class="section-title">激活 · 豁免 · 退出</h2>
 
@@ -430,36 +693,63 @@
     <div class="cmd-item"><code>满编蜂群</code><span>R1–R4b 各至少一次</span></div>
     <div class="cmd-item"><code>记忆接力</code><span>触发跨会话记忆接力</span></div>
   </div>
+
+  <div class="warning-block">
+    <div class="w-icon">⚠</div>
+    <div class="w-text">
+      <strong>反降级总闸</strong>：非用户明示豁免不得降级。不得以任务小、省 Token 等理由静默省略已触发的蜂群/军团义务。
+    </div>
+  </div>
 </section>
 
 <!-- Evidence -->
-<section>
+<section class="section-outer">
   <div class="section-label">质量保障</div>
   <h2 class="section-title">A/B/C 证据分级 + TC 编号体系</h2>
-  <table class="charter-table" style="margin-top:1.5rem">
-    <tr><th>等级</th><th>含义</th><th>示例</th><th>可写入已拍板</th></tr>
-    <tr><td><strong style="color:#48bb78">A · 可验证</strong></td><td>附带可复核证据</td><td>URL+条款、命令+退出码+输出、路径+行号</td><td>✅ 是</td></tr>
-    <tr><td><strong style="color:var(--gold)">B · 待核实</strong></td><td>逻辑自洽但未对外复核</td><td>推理结论，尚未外部验证</td><td>❌ 否</td></tr>
-    <tr><td><strong style="color:var(--muted)">C · 观点</strong></td><td>偏好、经验法则、无证据链</td><td>"我认为 X 更好"</td><td>❌ 否</td></tr>
-  </table>
-  <div style="display:flex;gap:2rem;margin-top:1.5rem;flex-wrap:wrap;justify-content:center">
-    <div style="background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:1.5rem;text-align:center;min-width:160px">
-      <div style="font-size:2rem;font-weight:900;color:#48bb78">PASS</div><div style="color:var(--muted);font-size:0.85rem">P0 全部通过</div>
+
+  <div class="table-wrap" style="margin-top:1.5rem">
+    <table>
+      <tr><th>等级</th><th>含义</th><th>示例</th><th>可写入已拍板</th></tr>
+      <tr>
+        <td><strong style="color:var(--green)">A · 可验证</strong></td>
+        <td>附带可复核证据</td><td>URL+条款、命令+退出码+输出、路径+行号</td>
+        <td style="color:var(--green)">是</td>
+      </tr>
+      <tr>
+        <td><strong style="color:var(--orange)">B · 待核实</strong></td>
+        <td>逻辑自洽但未对外复核</td><td>推理结论，尚未外部验证</td>
+        <td style="color:var(--red)">否</td>
+      </tr>
+      <tr>
+        <td><strong style="color:var(--text-muted)">C · 观点</strong></td>
+        <td>偏好、经验法则、无证据链</td><td>"我认为 X 更好"</td>
+        <td style="color:var(--red)">否</td>
+      </tr>
+    </table>
+  </div>
+
+  <div class="verdict-grid">
+    <div class="verdict-card">
+      <div class="v-label v-pass">PASS</div>
+      <div class="v-desc">P0 全部通过</div>
     </div>
-    <div style="background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:1.5rem;text-align:center;min-width:160px">
-      <div style="font-size:2rem;font-weight:900;color:var(--gold)">COND_PASS</div><div style="color:var(--muted);font-size:0.85rem">P0 通过 · P1 未闭环</div>
+    <div class="verdict-card">
+      <div class="v-label v-cond">COND_PASS</div>
+      <div class="v-desc">P0 通过 · P1 未闭环</div>
     </div>
-    <div style="background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:1.5rem;text-align:center;min-width:160px">
-      <div style="font-size:2rem;font-weight:900;color:#e53e3e">FAIL</div><div style="color:var(--muted);font-size:0.85rem">任一 P0 未过</div>
+    <div class="verdict-card">
+      <div class="v-label v-fail">FAIL</div>
+      <div class="v-desc">任一 P0 未过</div>
     </div>
   </div>
 </section>
 
 <footer>
-  <p><strong>Swarm & Legion</strong> — 蜂群+军团治理体系 · Claude Code 适配版</p>
-  <p style="margin-top:0.5rem">
+  <p><strong>Swarm &amp; Legion</strong> — 蜂群+军团治理体系 · Claude Code 适配版</p>
+  <p style="margin-top:0.4rem">
     <a href="https://github.com/MQCCharness/claude_harness">GitHub</a> · 由 <a href="https://claude.ai">Claude Code</a> 驱动
   </p>
 </footer>
+
 </body>
 </html>
