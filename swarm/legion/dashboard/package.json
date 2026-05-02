@@ -1,0 +1,18 @@
+{
+  "name": "legion-runtime-dashboard",
+  "version": "1.0.0",
+  "private": true,
+  "description": "本地小服务：监听军团 chains 落盘并推送到浏览器",
+  "type": "module",
+  "scripts": {
+    "start": "node server.mjs",
+    "dev": "node server.mjs"
+  },
+  "dependencies": {
+    "chokidar": "^4.0.3",
+    "ws": "^8.18.0"
+  },
+  "engines": {
+    "node": ">=18"
+  }
+}

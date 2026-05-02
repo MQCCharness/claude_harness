@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Legion 运行时看板</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
+  <style>body { font-family: Inter, system-ui, sans-serif; }</style>
+</head>
+<body class="bg-slate-950 text-slate-100 min-h-screen">
+  <div class="max-w-5xl mx-auto px-4 py-8">
+    <header class="mb-8 flex flex-wrap items-center justify-between gap-4">
+      <div>
+        <h1 class="text-2xl font-bold text-white">Legion 运行时看板</h1>
+        <p class="text-slate-400 text-sm mt-1">监听 <code class="text-sky-400">legion/chains</code> 落盘，WebSocket 推送变更</p>
+      </div>
+      <div class="flex items-center gap-3">
+        <span id="ws-status" class="text-xs px-2 py-1 rounded bg-slate-800 text-slate-400">连接中…</span>
+        <select id="chain-select" class="bg-slate-900 border border-slate-600 rounded-lg px-3 py-2 text-sm text-white"></select>
+        <button type="button" id="btn-refresh" class="bg-sky-600 hover:bg-sky-500 text-white text-sm px-3 py-2 rounded-lg">刷新</button>
+      </div>
+    </header>
+
+    <section id="chain-panel" class="rounded-xl border border-slate-700/80 bg-slate-900/50 p-6 hidden">
+      <div class="mb-4">
+        <p class="text-xs text-slate-500 uppercase tracking-wide">CHAIN</p>
+        <p id="chain-id" class="text-lg font-mono text-sky-300"></p>
+        <p id="chain-theme" class="text-slate-300 mt-2"></p>
+      </div>
+      <p id="chain-warn" class="text-amber-200 text-sm mb-4 hidden"></p>
+
+      <h2 class="text-sm font-semibold text-white mb-3 flex items-center gap-2">
+        <span class="w-1 h-4 bg-emerald-500 rounded"></span> 执行进度（README）
+      </h2>
+      <div class="overflow-x-auto rounded-lg border border-slate-700/60">
+        <table class="w-full text-sm">
+          <thead>
+            <tr class="border-b border-slate-700 text-slate-400 text-left">
+              <th class="px-3 py-2">EP</th>
+              <th class="px-3 py-2">状态</th>
+              <th class="px-3 py-2">产出摘要</th>
+            </tr>
+          </thead>
+          <tbody id="ep-body"></tbody>
+        </table>
+      </div>
+
+      <h2 class="text-sm font-semibold text-white mt-8 mb-3 flex items-center gap-2">
+        <span class="w-1 h-4 bg-amber-500 rounded"></span> Phase Gate 文件
+      </h2>
+      <ul id="gate-list" class="text-sm text-slate-300 space-y-2"></ul>
+
+      <p class="text-xs text-slate-500 mt-6">上次拉取：<span id="fetch-time">—</span> · README mtime：<span id="readme-mtime">—</span></p>
+    </section>
+
+    <section id="empty-state" class="rounded-xl border border-dashed border-slate-600 p-8 text-center text-slate-400">
+      <p>请选择一条 CHAIN，或确认 <code class="text-sky-500">chains/</code> 下存在军团链目录。</p>
+    </section>
+
+    <footer class="mt-12 text-center text-xs text-slate-600">
+      <p>细粒度「任务进行中」需统帅/脚本写入约定状态文件；本页以 README / Gate 落盘为准。</p>
+    </footer>
+  </div>
+
+  <script src="./app.js"></script>
+</body>
+</html>

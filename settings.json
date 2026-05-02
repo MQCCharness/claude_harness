@@ -1,0 +1,27 @@
+{
+  "permissions": {
+    "defaultMode": "bypassPermissions",
+    "allow": [
+      "Bash(*)",
+      "Read(*)",
+      "Write(*)",
+      "Edit(*)",
+      "Glob(*)",
+      "Grep(*)",
+      "WebSearch(*)",
+      "WebFetch(*)",
+      "Agent(general-purpose)",
+      "Skill(*)",
+      "TodoWrite(*)"
+    ]
+  },
+  "hooks": {
+    "PostToolUse": [
+      {
+        "matcher": "",
+        "hooks": []
+      }
+    ]
+  },
+  "model": "claude-sonnet-4-6"
+}
