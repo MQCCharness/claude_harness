@@ -45,7 +45,27 @@
   }
 
   /* ═══════════════════════════════════════════
-     LAYER 0 — Ambient glow orbs (fixed)
+     LAYER 0 — EVA-01 blurred image background (fixed)
+     ═══════════════════════════════════════════ */
+  .bg-eva-img {
+    position:fixed; inset:0; z-index:0; pointer-events:none;
+  }
+  .bg-eva-img img {
+    width:100%; height:100%; object-fit:cover;
+    filter:blur(60px) brightness(0.4) saturate(1.2);
+    transform:scale(1.1); /* hide blur edges */
+  }
+  /* gradient overlays on top of blurred image */
+  .bg-eva-overlay {
+    position:fixed; inset:0; z-index:0; pointer-events:none;
+    background:
+      radial-gradient(ellipse 80% 60% at 50% 0%, rgba(109,40,217,0.25) 0%, transparent 60%),
+      radial-gradient(ellipse 60% 50% at 20% 80%, rgba(57,255,20,0.08) 0%, transparent 60%),
+      radial-gradient(ellipse 50% 40% at 80% 40%, rgba(217,70,239,0.08) 0%, transparent 60%);
+  }
+
+  /* ═══════════════════════════════════════════
+     LAYER 1 — Ambient glow orbs (fixed)
      ═══════════════════════════════════════════ */
   .bg-layer { position:fixed; inset:0; pointer-events:none; z-index:0; }
   .bg-orb {
@@ -824,6 +844,10 @@
 <body>
 
 <!-- Background layers -->
+<div class="bg-eva-img">
+  <img src="images/Snipaste_2026-05-03_01-33-35.png" alt="" aria-hidden="true">
+</div>
+<div class="bg-eva-overlay"></div>
 <div class="bg-layer">
   <div class="bg-orb purple"></div>
   <div class="bg-orb green"></div>
