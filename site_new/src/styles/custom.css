@@ -1,0 +1,98 @@
+:root {
+  --sl-color-accent-low: #2a1a0a;
+  --sl-color-accent: #f7c948;
+  --sl-color-accent-high: #ff6b35;
+}
+
+.role-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+  gap: 1rem;
+  margin: 1.5rem 0;
+}
+.role-card {
+  border: 1px solid var(--sl-color-hairline);
+  border-radius: 12px;
+  padding: 1.25rem;
+  transition: border-color 0.2s;
+}
+.role-card:hover {
+  border-color: var(--sl-color-accent);
+}
+.role-card .role-tag {
+  display: inline-block;
+  background: var(--sl-color-accent);
+  color: #1a1a2e;
+  padding: 2px 8px;
+  border-radius: 4px;
+  font-size: 0.75rem;
+  font-weight: 700;
+  margin-bottom: 0.5rem;
+}
+.role-card h3 {
+  margin-top: 0.25rem;
+  font-size: 1.1rem;
+}
+
+.gate-flow {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  margin: 1.5rem 0;
+  padding: 1rem;
+  background: var(--sl-color-bg-sidebar);
+  border-radius: 12px;
+}
+.gate-row {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+.gate-label {
+  background: var(--sl-color-accent);
+  color: #1a1a2e;
+  padding: 4px 10px;
+  border-radius: 4px;
+  font-weight: 700;
+  font-size: 0.8rem;
+  min-width: 70px;
+  text-align: center;
+}
+
+.phase-timeline {
+  display: flex;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+  margin: 1.5rem 0;
+}
+.phase-step {
+  background: var(--sl-color-accent-low);
+  border: 1px solid var(--sl-color-accent);
+  border-radius: 8px;
+  padding: 0.5rem 1rem;
+  font-weight: 600;
+  font-size: 0.85rem;
+  white-space: nowrap;
+}
+.phase-arrow {
+  color: var(--sl-color-accent);
+  font-weight: 700;
+  align-self: center;
+}
+
+table.charter {
+  width: 100%;
+  border-collapse: collapse;
+}
+table.charter th, table.charter td {
+  padding: 0.75rem 1rem;
+  border: 1px solid var(--sl-color-hairline);
+}
+table.charter th {
+  background: var(--sl-color-bg-sidebar);
+  font-weight: 700;
+}
+table.charter td:last-child {
+  text-align: center;
+  font-weight: 600;
+}
