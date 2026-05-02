@@ -6,7 +6,7 @@
 <title>蜂群+军团 — Swarm &amp; Legion | AI 对抗式协作方法论</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=Noto+Sans+SC:wght@400;500;700;900&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=Noto+Sans+SC:wght@400;500;700;900&family=Noto+Serif+SC:wght@700;900&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
 <style>
   :root {
     --bg-deepest: #06040E;
@@ -298,10 +298,12 @@
     50% { opacity:0.3; box-shadow:0 0 16px var(--green), 0 0 28px rgba(57,255,20,0.5); }
   }
   .section-title {
+    font-family:'Noto Serif SC','Noto Serif',serif;
     font-size:clamp(2.2rem, 4vw, 3.2rem);
-    font-weight:900; letter-spacing:-1px;
-    line-height:1.15; margin-bottom:1rem;
+    font-weight:900; letter-spacing:0.08em;
+    line-height:1.2; margin-bottom:1rem;
     color:#F0EDF6;
+    text-shadow:0 0 20px rgba(255,255,255,0.08);
   }
   .section-title .accent {
     background:linear-gradient(135deg, var(--purple-light), var(--green));
@@ -828,6 +830,71 @@
   .nerv-stripes.br { bottom:0; right:0; }
 
   /* ═══════════════════════════════════════════
+     EVA TITLE CARD TYPOGRAPHY
+     ═══════════════════════════════════════════ */
+  .eva-title-card {
+    position:relative; z-index:1;
+    text-align:center;
+    padding:2.5rem 1.5rem;
+    border-top:1px solid rgba(239,68,68,0.25);
+    border-bottom:1px solid rgba(239,68,68,0.25);
+    margin:0 auto;
+    max-width:900px;
+  }
+  .eva-title-card .eva-jp {
+    display:block;
+    font-family:'Noto Serif SC', 'Noto Serif', serif;
+    font-weight:900; font-size:clamp(1.8rem, 5vw, 3.2rem);
+    letter-spacing:0.4em;
+    color:#fff;
+    text-shadow:
+      0 0 10px rgba(255,255,255,0.3),
+      0 0 40px rgba(255,255,255,0.1),
+      0 0 80px rgba(139,92,246,0.2);
+    line-height:1.3;
+  }
+  .eva-title-card .eva-en {
+    display:block;
+    font-family:'JetBrains Mono', monospace;
+    font-weight:500; font-size:clamp(0.65rem, 1.5vw, 0.8rem);
+    letter-spacing:0.6em;
+    color:var(--text-muted);
+    margin-top:0.6rem;
+    text-transform:uppercase;
+  }
+  .eva-title-card .eva-red-line {
+    position:absolute; top:-1px; left:50%; transform:translateX(-50%);
+    width:min(300px, 60vw); height:3px;
+    background:linear-gradient(90deg, transparent, rgba(239,68,68,0.6), transparent);
+  }
+  /* variant: smaller inline title */
+  .eva-label {
+    font-family:'Noto Serif SC', 'Noto Serif', serif;
+    font-weight:900;
+    letter-spacing:0.25em;
+    color:#fff;
+    text-shadow:0 0 8px rgba(255,255,255,0.2), 0 0 24px rgba(139,92,246,0.15);
+  }
+  /* grain texture overlay (reusable) */
+  .grain-overlay {
+    position:absolute; inset:0; pointer-events:none; z-index:0; opacity:0.06;
+    background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+  }
+  /* CRT scanline effect bar */
+  .eva-hr {
+    display:flex; align-items:center; gap:1rem;
+    max-width:600px; margin:2rem auto;
+    opacity:0.6;
+  }
+  .eva-hr .bar { flex:1; height:1px; background:var(--border); }
+  .eva-hr .diamond {
+    width:7px; height:7px;
+    background:var(--red);
+    transform:rotate(45deg); flex-shrink:0;
+    box-shadow:0 0 6px rgba(239,68,68,0.4);
+  }
+
+  /* ═══════════════════════════════════════════
      RESPONSIVE
      ═══════════════════════════════════════════ */
   @media (max-width:768px) {
@@ -872,7 +939,7 @@
     SWARM + LEGION
   </div>
   <div class="links">
-    <a href="#levels">模式层级</a>
+    <a href="#levels">体系层级</a>
     <a href="#swarm">蜂群 L2</a>
     <a href="#legion">军团 L3</a>
     <a href="#commands">命令速查</a>
@@ -906,6 +973,13 @@
   </div>
 </section>
 
+<div class="eva-title-card reveal" style="margin-top:2rem;">
+  <div class="eva-red-line"></div>
+  <span class="eva-jp">對抗產生質量</span>
+  <span class="eva-en">Adversarial Produces Quality</span>
+  <div class="grain-overlay"></div>
+</div>
+
 <!-- Levels -->
 <section id="levels" class="section-outer">
   <div class="section-label">三级可缩放治理</div>
@@ -930,6 +1004,10 @@
     </div>
   </div>
 </section>
+
+<div class="eva-hr reveal" style="margin-top:3rem;">
+  <div class="bar"></div><div class="diamond"></div><div class="bar"></div>
+</div>
 
 <!-- Swarm -->
 <section id="swarm" class="section-outer bg-purple" style="position:relative;">
@@ -980,6 +1058,10 @@
     <div class="gate-node decision"><strong>PASS/FAIL</strong><span>统帅亲测裁决</span></div>
   </div>
 </section>
+
+<div class="eva-hr reveal" style="margin-top:3rem;">
+  <div class="bar"></div><div class="diamond"></div><div class="bar"></div>
+</div>
 
 <!-- Legion -->
 <section id="legion" class="section-outer bg-green" style="position:relative;">
@@ -1036,6 +1118,10 @@
   </div>
 </section>
 
+<div class="eva-hr reveal" style="margin-top:3rem;">
+  <div class="bar"></div><div class="diamond"></div><div class="bar"></div>
+</div>
+
 <!-- Commands -->
 <section id="commands" class="section-outer bg-orange">
   <div class="section-label">命令速查</div>
@@ -1071,6 +1157,10 @@
     </div>
   </div>
 </section>
+
+<div class="eva-hr reveal" style="margin-top:3rem;">
+  <div class="bar"></div><div class="diamond"></div><div class="bar"></div>
+</div>
 
 <!-- Evidence -->
 <section class="section-outer">
